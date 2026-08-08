@@ -5,10 +5,8 @@ import com.example.a4kwa.model.FilterPreset
 object FfmpegCommandBuilder {
 
     const val SEGMENT_DURATION_SECONDS = 30L
-    private const val CRF = "18"
-    private const val PRESET = "medium"
     private const val PROFILE = "high"
-    private const val AUDIO_BITRATE = "192k"
+    private const val AUDIO_BITRATE = "128k"
 
     fun buildSegmentCommand(
         inputPath: String,
@@ -26,7 +24,9 @@ object FfmpegCommandBuilder {
         denoise: Boolean = false,
         autoLevels: Boolean = false,
         deblock: Boolean = false,
-        segmentDurationMs: Long = 30_000L
+        segmentDurationMs: Long = 30_000L,
+        crfValue: String = "22",
+        ffmpegPreset: String = "veryfast"
     ): List<String> {
         val startSeconds = (startMs / 1000L).coerceAtLeast(0L)
 
@@ -45,8 +45,8 @@ object FfmpegCommandBuilder {
             }
 
             add("-c:v"); add("libx264")
-            add("-preset"); add(PRESET)
-            add("-crf"); add(CRF)
+            add("-preset"); add(ffmpegPreset)
+            add("-crf"); add(crfValue)
             add("-profile:v"); add(PROFILE)
             add("-pix_fmt"); add("yuv420p")
             add("-c:a"); add("aac")

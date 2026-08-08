@@ -84,14 +84,16 @@ class VideoProcessor {
         autoLevels: Boolean = false,
         deblock: Boolean = false,
         listener: Listener,
-        deselectedIndices: Set<Int> = emptySet()
+        deselectedIndices: Set<Int> = emptySet(),
+        crfValue: String = "22",
+        ffmpegPreset: String = "veryfast"
     ) {
         cancelled = false
         lastProgress = 0f
         outputDir.mkdirs()
         val totalClips = (totalDurationMs + SEGMENT_DURATION_MS - 1) / SEGMENT_DURATION_MS
         val clips = ArrayList<ProcessedClip>()
-        runSegment(inputFile, outputDir, 0, totalClips.toInt(), totalDurationMs, outputWidth, outputHeight, rotationDegrees, sourceWidth, sourceHeight, forcePortrait, blurBackground, filter, sharpen, denoise, autoLevels, deblock, listener, clips, deselectedIndices)
+        runSegment(inputFile, outputDir, 0, totalClips.toInt(), totalDurationMs, outputWidth, outputHeight, rotationDegrees, sourceWidth, sourceHeight, forcePortrait, blurBackground, filter, sharpen, denoise, autoLevels, deblock, listener, clips, deselectedIndices, crfValue, ffmpegPreset)
     }
 
     fun startSingleSegment(
@@ -111,7 +113,9 @@ class VideoProcessor {
         denoise: Boolean = false,
         autoLevels: Boolean = false,
         deblock: Boolean = false,
-        listener: Listener
+        listener: Listener,
+        crfValue: String = "22",
+        ffmpegPreset: String = "veryfast"
     ) {
         cancelled = false
         lastProgress = 0f
@@ -134,7 +138,9 @@ class VideoProcessor {
             denoise = denoise,
             autoLevels = autoLevels,
             deblock = deblock,
-            segmentDurationMs = durationMs
+            segmentDurationMs = durationMs,
+            crfValue = crfValue,
+            ffmpegPreset = ffmpegPreset
         )
 
         val session = FFmpegKit.executeWithArgumentsAsync(
@@ -202,7 +208,9 @@ class VideoProcessor {
         deblock: Boolean,
         listener: Listener,
         clips: MutableList<ProcessedClip>,
-        deselectedIndices: Set<Int> = emptySet()
+        deselectedIndices: Set<Int> = emptySet(),
+        crfValue: String = "22",
+        ffmpegPreset: String = "veryfast"
     ) {
         if (cancelled) {
             listener.onCancelled()
@@ -211,7 +219,7 @@ class VideoProcessor {
 
         if (index in deselectedIndices) {
             if (index + 1 < totalClips) {
-                runSegment(inputFile, outputDir, index + 1, totalClips, totalDurationMs, outputWidth, outputHeight, rotationDegrees, sourceWidth, sourceHeight, forcePortrait, blurBackground, filter, sharpen, denoise, autoLevels, deblock, listener, clips, deselectedIndices)
+                            runSegment(inputFile, outputDir, index + 1, totalClips, totalDurationMs, outputWidth, outputHeight, rotationDegrees, sourceWidth, sourceHeight, forcePortrait, blurBackground, filter, sharpen, denoise, autoLevels, deblock, listener, clips, deselectedIndices, crfValue, ffmpegPreset)
             } else {
                 val finalClips = clips.mapIndexed { i, c -> c.copy(index = i, totalClips = clips.size) }
                 listener.onComplete(finalClips)
@@ -236,7 +244,9 @@ class VideoProcessor {
             sharpen = sharpen,
             denoise = denoise,
             autoLevels = autoLevels,
-            deblock = deblock
+            deblock = deblock,
+            crfValue = crfValue,
+            ffmpegPreset = ffmpegPreset
         )
 
         val session = FFmpegKit.executeWithArgumentsAsync(
@@ -263,7 +273,7 @@ class VideoProcessor {
                         clips.add(clip)
                         listener.onSegmentComplete(clip)
                         if (index + 1 < totalClips) {
-                            runSegment(inputFile, outputDir, index + 1, totalClips, totalDurationMs, outputWidth, outputHeight, rotationDegrees, sourceWidth, sourceHeight, forcePortrait, blurBackground, filter, sharpen, denoise, autoLevels, deblock, listener, clips, deselectedIndices)
+                runSegment(inputFile, outputDir, index + 1, totalClips, totalDurationMs, outputWidth, outputHeight, rotationDegrees, sourceWidth, sourceHeight, forcePortrait, blurBackground, filter, sharpen, denoise, autoLevels, deblock, listener, clips, deselectedIndices, crfValue, ffmpegPreset)
                         } else {
                             listener.onComplete(clips)
                         }

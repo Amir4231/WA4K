@@ -219,7 +219,9 @@ class VideoUploaderViewModel(application: Application) : AndroidViewModel(applic
                 override fun onError(message: String) {
                     _uiState.value = UploaderUiState.Error(message)
                 }
-            }
+            },
+            crfValue = state.preset.crfValue,
+            ffmpegPreset = state.preset.ffmpegPreset
         )
     }
 
@@ -484,9 +486,14 @@ class VideoUploaderViewModel(application: Application) : AndroidViewModel(applic
             listener = object : VideoProcessor.Listener {
                 override fun onProgress(progress: Float, clipIndex: Int, totalClips: Int) {
                     val elapsed = System.currentTimeMillis() - processingStartTime
-                    val speed = if (elapsed > 0) (progress * video.durationMs / elapsed).toFloat() else 0f
-                    val eta = if (progress > 0f && speed > 0f) ((1f - progress) * video.durationMs / (speed * 1000f)).toLong() else 0L
-                    _uiState.value = UploaderUiState.Processing(progress, clipIndex, totalClips, speedMultiplier = speed, etaSeconds = eta, presetLabel = preset.label)
+                    if (progress > 0f && elapsed > 0) {
+                        val totalEstimated = (elapsed / progress).toLong()
+                        val eta = (totalEstimated - elapsed) / 1000L
+                        val speed = if (elapsed > 0) (video.durationMs * progress / elapsed).toFloat() / 1000f else 0f
+                        _uiState.value = UploaderUiState.Processing(progress, clipIndex, totalClips, speedMultiplier = speed, etaSeconds = eta, presetLabel = preset.label)
+                    } else {
+                        _uiState.value = UploaderUiState.Processing(progress, clipIndex, totalClips, presetLabel = preset.label)
+                    }
                 }
                 override fun onSegmentComplete(clip: ProcessedClip) {}
                 override fun onComplete(clips: List<ProcessedClip>) {
@@ -503,7 +510,9 @@ class VideoUploaderViewModel(application: Application) : AndroidViewModel(applic
                 }
                 override fun onError(message: String) { _uiState.value = UploaderUiState.Error(message) }
             },
-            deselectedIndices = deselectedIndices
+            deselectedIndices = deselectedIndices,
+            crfValue = preset.crfValue,
+            ffmpegPreset = preset.ffmpegPreset
         )
     }
 

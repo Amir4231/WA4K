@@ -31,7 +31,9 @@ class FfmpegCommandBuilderTest {
             outputPath = "/out/clip_1.mp4",
             startMs = 0,
             outputWidth = 1080,
-            outputHeight = 1920
+            outputHeight = 1920,
+            crfValue = "18",
+            ffmpegPreset = "medium"
         )
 
         assertEquals("libx264", args[args.indexOf("-c:v") + 1])
@@ -52,7 +54,7 @@ class FfmpegCommandBuilderTest {
         )
 
         assertEquals("aac", args[args.indexOf("-c:a") + 1])
-        assertEquals("192k", args[args.indexOf("-b:a") + 1])
+        assertEquals("128k", args[args.indexOf("-b:a") + 1])
         assertEquals("30", args[args.indexOf("-t") + 1])
         assertTrue(args.contains("-map"))
         assertTrue(args.contains("0:a:0?"))
