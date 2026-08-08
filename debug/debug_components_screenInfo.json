@@ -1,0 +1,194 @@
+{
+  "width": 720,
+  "height": 1600,
+  "elements": [
+    {
+      "description": "",
+      "resourceId": "",
+      "className": "android.view.View",
+      "bounds": [
+        0,
+        0,
+        720,
+        1600
+      ]
+    },
+    {
+      "description": "",
+      "resourceId": "android:id/content",
+      "className": "android.widget.FrameLayout",
+      "bounds": [
+        0,
+        0,
+        720,
+        1600
+      ]
+    },
+    {
+      "description": "",
+      "resourceId": "",
+      "className": "androidx.compose.ui.platform.ComposeView",
+      "bounds": [
+        0,
+        0,
+        720,
+        1600
+      ]
+    },
+    {
+      "description": "",
+      "resourceId": "",
+      "className": "android.view.View",
+      "bounds": [
+        0,
+        0,
+        720,
+        1600
+      ]
+    },
+    {
+      "description": "",
+      "resourceId": "",
+      "className": "android.view.View",
+      "bounds": [
+        0,
+        0,
+        720,
+        1600
+      ]
+    },
+    {
+      "description": "",
+      "resourceId": "",
+      "className": "android.view.View",
+      "bounds": [
+        0,
+        0,
+        720,
+        1600
+      ]
+    },
+    {
+      "description": "",
+      "resourceId": "",
+      "className": "android.view.View",
+      "bounds": [
+        272,
+        439,
+        448,
+        615
+      ]
+    },
+    {
+      "description": "",
+      "resourceId": "",
+      "className": "android.widget.TextView",
+      "bounds": [
+        139,
+        660,
+        582,
+        724
+      ]
+    },
+    {
+      "description": "",
+      "resourceId": "",
+      "className": "android.widget.TextView",
+      "bounds": [
+        64,
+        734,
+        656,
+        812
+      ]
+    },
+    {
+      "description": "",
+      "resourceId": "",
+      "className": "android.view.View",
+      "bounds": [
+        64,
+        882,
+        656,
+        972
+      ]
+    },
+    {
+      "description": "",
+      "resourceId": "",
+      "className": "android.widget.TextView",
+      "bounds": [
+        307,
+        911,
+        459,
+        943
+      ]
+    },
+    {
+      "description": "",
+      "resourceId": "",
+      "className": "android.widget.Button",
+      "bounds": [
+        64,
+        882,
+        656,
+        972
+      ]
+    },
+    {
+      "description": "",
+      "resourceId": "",
+      "className": "android.view.View",
+      "bounds": [
+        64,
+        991,
+        656,
+        1071
+      ]
+    },
+    {
+      "description": "",
+      "resourceId": "",
+      "className": "android.widget.TextView",
+      "bounds": [
+        304,
+        1015,
+        417,
+        1047
+      ]
+    },
+    {
+      "description": "",
+      "resourceId": "",
+      "className": "android.widget.Button",
+      "bounds": [
+        64,
+        991,
+        656,
+        1071
+      ]
+    },
+    {
+      "description": "",
+      "resourceId": "",
+      "className": "android.widget.TextView",
+      "bounds": [
+        64,
+        1109,
+        656,
+        1161
+      ]
+    },
+    {
+      "description": "",
+      "resourceId": "",
+      "className": "android.view.View",
+      "bounds": [
+        0,
+        0,
+        720,
+        74
+      ]
+    }
+  ],
+  "currentApp": "com.example.a4kwa"
+}

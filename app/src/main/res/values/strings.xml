@@ -1,0 +1,40 @@
+<resources>
+    <string name="app_name">4K Status Uploader</string>
+
+    <string name="select_video">Select Video</string>
+    <string name="app_tagline">Optimize videos for high-quality WhatsApp status uploads</string>
+    <string name="split_hint">Videos longer than 30 seconds are automatically split into 30-second clips</string>
+
+    <string name="output_resolution">Output resolution</string>
+    <plurals name="will_be_split">
+        <item quantity="one">Will be split into %1$d clip of up to 30 seconds</item>
+        <item quantity="other">Will be split into %1$d clips of up to 30 seconds</item>
+    </plurals>
+    <string name="fits_in_one_clip">Fits in a single clip</string>
+    <string name="process_for_whatsapp">Process for WhatsApp</string>
+    <string name="choose_different_video">Choose different video</string>
+
+    <string name="cancel">Cancel</string>
+    <string name="processing_clip">Processing clip %1$d of %2$d</string>
+
+    <plurals name="clips_ready">
+        <item quantity="one">%1$d clip ready to share</item>
+        <item quantity="other">%1$d clips ready to share</item>
+    </plurals>
+    <string name="share_all">Share All Clips</string>
+    <string name="clip_label">Clip %1$d of %2$d</string>
+    <string name="share_to_whatsapp">Share to WhatsApp</string>
+    <string name="process_another">Process another video</string>
+    <string name="results_hint">Tap Share on a clip to post it as a status, or Share All to send everything at once.</string>
+
+    <string name="share_via">Share video via</string>
+    <string name="duration_label">Duration: %1$s</string>
+    <string name="resolution_label">%1$d × %2$d</string>
+    <string name="size_label">Size: %1$s</string>
+
+    <string name="error">Error</string>
+    <string name="error_could_not_read">Could not read the selected video. Try another file.</string>
+    <string name="error_processing">Failed to process the video. The file may be unsupported or corrupted.</string>
+    <string name="retry">Retry</string>
+    <string name="reading_video">Reading video…</string>
+</resources>
