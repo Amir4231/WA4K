@@ -23,6 +23,7 @@ import com.example.a4kwa.model.OutputResolution
 import com.example.a4kwa.model.ProcessedClip
 import com.example.a4kwa.model.VideoInfo
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -190,7 +191,9 @@ class VideoUploaderViewModel(application: Application) : AndroidViewModel(applic
         val presetLabel = state.preset.label
         showProgressNotification(0, 1, 0)
         _uiState.value = UploaderUiState.Processing(0f, 0, 1, presetLabel = presetLabel)
-        videoProcessor.startSingleSegment(
+        viewModelScope.launch(Dispatchers.Main) {
+            delay(200)
+            videoProcessor.startSingleSegment(
             inputFile = video.file,
             outputDir = outDir,
             startMs = startMs,
@@ -232,6 +235,7 @@ class VideoUploaderViewModel(application: Application) : AndroidViewModel(applic
             crfValue = state.preset.crfValue,
             ffmpegPreset = state.preset.ffmpegPreset
         )
+        }
     }
 
     fun toggleClipSelected(filePath: String) {
