@@ -2,10 +2,14 @@ package com.example.a4kwa.ui
 
 import android.app.Application
 import android.app.NotificationManager
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.net.Uri
 import android.provider.OpenableColumns
 import android.util.Log
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.a4kwa.service.TranscodeForegroundService
@@ -539,13 +543,22 @@ class VideoUploaderViewModel(application: Application) : AndroidViewModel(applic
 
     fun cancelProcessing() { videoProcessor.cancel(); dismissProgressNotification() }
 
+    private val cancelReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            cancelProcessing()
+        }
+    }
+
     private fun showProgressNotification(clipIndex: Int, totalClips: Int, percent: Int) {
         val statusText = if (totalClips > 0) "Processing clip ${clipIndex + 1} of $totalClips ($percent%)" else "Processing ($percent%)"
         val notification = TranscodeForegroundService.createNotification(app, percent, 100, statusText)
         notificationManager.notify(TranscodeForegroundService.NOTIFICATION_ID, notification)
+        val filter = IntentFilter(TranscodeForegroundService.ACTION_CANCEL)
+        ContextCompat.registerReceiver(app, cancelReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED)
     }
 
     private fun dismissProgressNotification() {
+        try { app.unregisterReceiver(cancelReceiver) } catch (_: Exception) {}
         notificationManager.cancel(TranscodeForegroundService.NOTIFICATION_ID)
     }
 
