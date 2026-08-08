@@ -374,6 +374,7 @@ class VideoUploaderViewModel(application: Application) : AndroidViewModel(applic
 
     fun processSingle() {
         val state = _uiState.value as? UploaderUiState.Picked ?: return
+        Log.d(TAG, "processSingle: deselectedIndices = ${state.deselectedSegmentIndices}")
         runProcess(state.video, state.resolution, state.forcePortrait, state.blurBackground, state.filter, state.sharpen, state.denoise, state.autoLevels, state.deblock, state.customWidthText, state.customHeightText, state.preset, singleItem = true, deselectedIndices = state.deselectedSegmentIndices)
     }
 

@@ -92,6 +92,7 @@ class VideoProcessor {
         lastProgress = 0f
         outputDir.mkdirs()
         val totalClips = (totalDurationMs + SEGMENT_DURATION_MS - 1) / SEGMENT_DURATION_MS
+        Log.d("VideoProcessor", "start: deselectedIndices = $deselectedIndices, totalClips = $totalClips")
         val clips = ArrayList<ProcessedClip>()
         runSegment(inputFile, outputDir, 0, totalClips.toInt(), totalDurationMs, outputWidth, outputHeight, rotationDegrees, sourceWidth, sourceHeight, forcePortrait, blurBackground, filter, sharpen, denoise, autoLevels, deblock, listener, clips, deselectedIndices, crfValue, ffmpegPreset)
     }
