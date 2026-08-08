@@ -1,11 +1,14 @@
 package com.example.a4kwa.ui
 
 import android.app.Application
+import android.app.NotificationManager
+import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.a4kwa.service.TranscodeForegroundService
 import com.example.a4kwa.domain.usecase.BitrateEstimate
 import com.example.a4kwa.domain.usecase.CalculateTargetBitrateUseCase
 import com.example.a4kwa.domain.usecase.PresetConfig
@@ -117,6 +120,7 @@ class VideoUploaderViewModel(application: Application) : AndroidViewModel(applic
     val uiState: StateFlow<UploaderUiState> = _uiState.asStateFlow()
 
     private var processingStartTime: Long = 0L
+    private val notificationManager by lazy { app.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager }
 
     private val _splitMode = MutableStateFlow(SplitMode.Auto)
     val splitMode: StateFlow<SplitMode> = _splitMode.asStateFlow()
@@ -184,6 +188,7 @@ class VideoUploaderViewModel(application: Application) : AndroidViewModel(applic
         }
 
         val presetLabel = state.preset.label
+        showProgressNotification(0, 1, 0)
         _uiState.value = UploaderUiState.Processing(0f, 0, 1, presetLabel = presetLabel)
         videoProcessor.startSingleSegment(
             inputFile = video.file,
@@ -208,15 +213,19 @@ class VideoUploaderViewModel(application: Application) : AndroidViewModel(applic
                     val speed = if (elapsed > 0) (progress * (endMs - startMs) / elapsed).toFloat() else 0f
                     val eta = if (progress > 0f && speed > 0f) ((1f - progress) * (endMs - startMs) / (speed * 1000f)).toLong() else 0L
                     _uiState.value = UploaderUiState.Processing(progress, clipIndex, totalClips, speedMultiplier = speed, etaSeconds = eta, presetLabel = presetLabel)
+                    showProgressNotification(0, 1, (progress * 100).toInt())
                 }
                 override fun onSegmentComplete(clip: ProcessedClip) {}
                 override fun onComplete(clips: List<ProcessedClip>) {
+                    dismissProgressNotification()
                     _uiState.value = if (clips.isEmpty()) UploaderUiState.Error(app.getString(com.example.a4kwa.R.string.error_processing)) else UploaderUiState.Results(clips)
                 }
                 override fun onCancelled() {
+                    dismissProgressNotification()
                     _uiState.value = UploaderUiState.TrimEditing(video, startMs, endMs, state.resolution, state.forcePortrait, state.blurBackground, state.filter, state.sharpen, state.denoise, state.autoLevels, state.deblock, state.customWidthText, state.customHeightText, state.preset)
                 }
                 override fun onError(message: String) {
+                    dismissProgressNotification()
                     _uiState.value = UploaderUiState.Error(message)
                 }
             },
@@ -477,6 +486,7 @@ class VideoUploaderViewModel(application: Application) : AndroidViewModel(applic
         }
 
         _uiState.value = UploaderUiState.Processing(0f, 0, video.segmentCount, presetLabel = preset.label)
+        showProgressNotification(0, video.segmentCount, 0)
         videoProcessor.start(
             inputFile = video.file, outputDir = outDir, totalDurationMs = video.durationMs,
             outputWidth = outputW, outputHeight = outputH, rotationDegrees = video.rotationDegrees,
@@ -491,12 +501,14 @@ class VideoUploaderViewModel(application: Application) : AndroidViewModel(applic
                         val eta = (totalEstimated - elapsed) / 1000L
                         val speed = if (elapsed > 0) (video.durationMs * progress / elapsed).toFloat() / 1000f else 0f
                         _uiState.value = UploaderUiState.Processing(progress, clipIndex, totalClips, speedMultiplier = speed, etaSeconds = eta, presetLabel = preset.label)
+                        showProgressNotification(clipIndex, totalClips, (progress * 100).toInt())
                     } else {
                         _uiState.value = UploaderUiState.Processing(progress, clipIndex, totalClips, presetLabel = preset.label)
                     }
                 }
                 override fun onSegmentComplete(clip: ProcessedClip) {}
                 override fun onComplete(clips: List<ProcessedClip>) {
+                    dismissProgressNotification()
                     if (clips.isEmpty()) {
                         _uiState.value = UploaderUiState.Error(app.getString(com.example.a4kwa.R.string.error_processing))
                     } else if (_splitMode.value == SplitMode.ManualSegments) {
@@ -506,9 +518,13 @@ class VideoUploaderViewModel(application: Application) : AndroidViewModel(applic
                     }
                 }
                 override fun onCancelled() {
+                    dismissProgressNotification()
                     _uiState.value = UploaderUiState.Picked(video, resolution, forcePortrait, blurBackground, filter, sharpen, denoise, autoLevels, deblock, customW, customH, preset, deselectedIndices)
                 }
-                override fun onError(message: String) { _uiState.value = UploaderUiState.Error(message) }
+                override fun onError(message: String) {
+                    dismissProgressNotification()
+                    _uiState.value = UploaderUiState.Error(message)
+                }
             },
             deselectedIndices = deselectedIndices,
             crfValue = preset.crfValue,
@@ -516,7 +532,17 @@ class VideoUploaderViewModel(application: Application) : AndroidViewModel(applic
         )
     }
 
-    fun cancelProcessing() { videoProcessor.cancel() }
+    fun cancelProcessing() { videoProcessor.cancel(); dismissProgressNotification() }
+
+    private fun showProgressNotification(clipIndex: Int, totalClips: Int, percent: Int) {
+        val statusText = if (totalClips > 0) "Processing clip ${clipIndex + 1} of $totalClips ($percent%)" else "Processing ($percent%)"
+        val notification = TranscodeForegroundService.createNotification(app, percent, 100, statusText)
+        notificationManager.notify(TranscodeForegroundService.NOTIFICATION_ID, notification)
+    }
+
+    private fun dismissProgressNotification() {
+        notificationManager.cancel(TranscodeForegroundService.NOTIFICATION_ID)
+    }
 
     fun reset() {
         videoProcessor.cancel()
